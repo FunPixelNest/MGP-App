@@ -2,7 +2,8 @@ package com.funpixelnest.mgp
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.performClick
 import androidx.test.core.app.ApplicationProvider
 import com.funpixelnest.mgp.data.PlayerStore
@@ -51,8 +52,8 @@ class ScreenshotTest {
         captureScreenRoboImage("../screenshots/$name.png")
     }
 
-    private fun click(text: String) {
-        compose.onNodeWithText(text, substring = true).performClick()
+    private fun click(text: String, substring: Boolean = true) {
+        compose.onAllNodesWithText(text, substring = substring).onFirst().performClick()
         compose.mainClock.advanceTimeBy(600)
     }
 
@@ -111,7 +112,7 @@ class ScreenshotTest {
     fun blackjack() {
         val store = newStore()
         shot("09_blackjack", interact = {
-            click("100")
+            click("100", substring = false)
             click("DEAL")
         }) { BlackjackScreen(store) {} }
     }
