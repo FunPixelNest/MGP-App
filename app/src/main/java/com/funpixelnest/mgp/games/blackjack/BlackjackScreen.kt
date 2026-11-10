@@ -285,17 +285,18 @@ private fun HandLabel(label: String, value: Int?) {
 private fun HandRow(cards: List<Card>, handId: Int, hideSecond: Boolean) {
     val overlap = CARD_WIDTH * 0.45f
     Box(Modifier.height(CARD_WIDTH * 1.4f + 4.dp)) {
-        if (cards.isEmpty()) return@Box
-        val total = CARD_WIDTH + (CARD_WIDTH - overlap) * (cards.size - 1)
-        Box(Modifier.width(total)) {
-            cards.forEachIndexed { i, card ->
-                key(handId, i) {
-                    DealtCard(
-                        card = card,
-                        faceUp = !(hideSecond && i == 1),
-                        x = (CARD_WIDTH - overlap) * i,
-                        delayMs = if (i < 2) i * 150 else 0,
-                    )
+        if (cards.isNotEmpty()) {
+            val total = CARD_WIDTH + (CARD_WIDTH - overlap) * (cards.size - 1)
+            Box(Modifier.width(total)) {
+                cards.forEachIndexed { i, card ->
+                    key(handId, i) {
+                        DealtCard(
+                            card = card,
+                            faceUp = !(hideSecond && i == 1),
+                            x = (CARD_WIDTH - overlap) * i,
+                            delayMs = if (i < 2) i * 150 else 0,
+                        )
+                    }
                 }
             }
         }
