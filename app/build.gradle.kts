@@ -33,6 +33,18 @@ android {
     buildFeatures {
         compose = true
     }
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+            all {
+                // `./gradlew testDebugUnitTest -Pscreenshots` writes PNGs of every screen to /screenshots.
+                if (project.hasProperty("screenshots")) {
+                    it.systemProperty("roborazzi.test.record", "true")
+                }
+                it.maxHeapSize = "2g"
+            }
+        }
+    }
 }
 
 dependencies {
@@ -48,5 +60,13 @@ dependencies {
     implementation(libs.androidx.material.icons.core)
     debugImplementation(libs.androidx.ui.tooling)
 
+    debugImplementation(libs.androidx.ui.test.manifest)
+
     testImplementation(libs.junit)
+    testImplementation(platform(libs.androidx.compose.bom))
+    testImplementation(libs.androidx.ui.test.junit4)
+    testImplementation(libs.androidx.test.core)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.roborazzi)
+    testImplementation(libs.roborazzi.compose)
 }

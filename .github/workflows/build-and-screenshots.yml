@@ -1,0 +1,61 @@
+name: Build & Screenshots
+
+on:
+  push:
+    paths-ignore:
+      - 'screenshots/**'
+      - '**.md'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Build debug APK
+        run: ./gradlew assembleDebug --stacktrace
+
+      - name: Run unit tests and record screenshots
+        run: ./gradlew testDebugUnitTest -Pscreenshots --stacktrace
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: mgp-games-debug-apk
+          path: app/build/outputs/apk/debug/*.apk
+
+      - name: Upload test reports
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: app/build/reports/tests/
+
+      - name: Commit screenshots back to the branch
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add screenshots
+          if git diff --cached --quiet; then
+            echo "Screenshots unchanged"
+          else
+            git commit -m "Update app screenshots [skip ci]"
+            git push origin HEAD:${{ github.ref_name }}
+          fi
