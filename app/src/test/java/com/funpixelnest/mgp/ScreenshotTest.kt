@@ -113,7 +113,7 @@ class ScreenshotTest {
         val store = newStore()
         shot("09_blackjack", interact = {
             click("100", substring = false)
-            click("DEAL")
+            click("DEAL 100", substring = false)
         }) { BlackjackScreen(store) {} }
     }
 
